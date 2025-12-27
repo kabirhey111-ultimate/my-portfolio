@@ -1,57 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  ChevronRight, 
   Stethoscope, 
   Cpu, 
   BookOpen, 
-  ExternalLink, 
   TrendingUp,
-  Brain,
-  Mic,
-  MessageSquare,
-  Globe,
-  Sparkles,
-  Loader2,
   Terminal,
-  Calendar,
   Send,
-  User,
-  Bot,
   X,
   Mail,
   Phone,
   ArrowRight,
   Code,
   Microscope,
-  Award,
-  Zap,
   CheckCircle2,
   Plus,
-  Minus,
-  MessageCircle
+  Minus
 } from 'lucide-react';
-
-// API Configuration
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY; // Provided by environment at runtime
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [scrolled, setScrolled] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiResponse, setAiResponse] = useState(null);
-  const [activeModal, setActiveModal] = useState(null);
   const [showContactModal, setShowContactModal] = useState(false);
-  
-  // FAQ State
   const [openFaq, setOpenFaq] = useState(null);
-
-  // Chatbot State
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    { role: 'bot', text: "Assalamu Alaikum! I'm Kabir's AI assistant. Ask me anything about his journey, skills, or future goals." }
-  ]);
-  const chatEndRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -59,71 +29,9 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages]);
-
   const navigate = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const callGemini = async (prompt, systemInstruction) => {
-  let delay = 1000;
-  for (let i = 0; i < 5; i++) {
-    try {
-      // Updated URL with a stable model name: gemini-2.5-flash
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          systemInstruction: { parts: [{ text: systemInstruction }] }
-        })
-      });
-
-      if (!response.ok) throw new Error('API Error');
-      return await response.json();
-    } catch (error) {
-      if (i === 4) throw error;
-      await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 2;
-    }
-  }
-};
-
-  const handleAiAction = async (type) => {
-    setActiveModal(type);
-    setAiLoading(true);
-    setAiResponse(null);
-    
-    const prompts = {
-      roadmap: {
-        sys: "You are an elite career counselor. Provide a gist, punchy, and highly visual roadmap (use emojis and bullet points). Max 150 words.",
-        user: "Generate a strategic roadmap for M. Kabir (all-time topper, UPSC Class 10 leader, AI enthusiast) to lead robotic surgery innovation by SSC 2026 and beyond."
-      },
-      pitch: {
-        sys: "You are a top-tier brand strategist. Create a 'gist' elevator pitch that is punchy, professional, and eye-catching. Max 100 words.",
-        user: "Create a powerful elevator pitch for M. Kabir, highlighting his transition from 25% topper to 100% 5-time consecutive topper at UPSC."
-      }
-    };
-
-    const result = await callGemini(prompts[type].user, prompts[type].sys);
-    setAiResponse(result || "Analysis failed. Please try again.");
-    setAiLoading(false);
-  };
-
-  const handleChatSubmit = async (e) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-    const userMsg = chatInput;
-    setChatInput("");
-    setChatMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    const botResponse = await callGemini(
-      userMsg, 
-      "You are Kabir's personal AI assistant. Be helpful, concise, and professional. Mention his achievements like 5x UPSC topper, BTV Quizzer, and his goal of becoming an AI-driven Surgeon when relevant. Keep responses short and punchy."
-    );
-    setChatMessages(prev => [...prev, { role: 'bot', text: botResponse || "I'm having trouble connecting right now." }]);
   };
 
   const CheckIcon = () => (
@@ -136,16 +44,15 @@ const App = () => {
 
   const HomeView = () => {
     const faqs = [
-      { q: "How do you balance competitive exams with AI research?", a: "It's about integration, not separation. I use custom AI prompts to synthesize biology notes and math patterns, making my study time 3x more efficient than traditional methods." },
-      { q: "Are you open to collaborative projects?", a: "Absolutely. I am particularly interested in projects that bridge the gap between Ed-Tech and biological sciences. Reach out via WhatsApp for quick collab discussions." },
-      { q: "What is your vision for robotic surgery?", a: "I believe the surgeon of the future is a pilot of algorithms. My goal is to understand the code behind the robot as deeply as the anatomy beneath the scalpel." }
+      { q: "How do you balance competitive exams with technical research?", a: "It's about integration, not separation. I use structured systems to synthesize biology notes and math patterns, making study time 3x more efficient than traditional methods." },
+      { q: "Are you open to collaborative projects?", a: "Absolutely. I am particularly interested in projects that bridge the gap between Ed-Tech and biological sciences. Reach out via WhatsApp for quick discussions." },
+      { q: "What is your vision for robotic surgery?", a: "I believe the surgeon of the future is a pilot of algorithms. My goal is to understand the technology behind the robot as deeply as the anatomy beneath the scalpel." }
     ];
 
     return (
       <div className="animate-in fade-in duration-700">
         {/* Cinematic Hero */}
         <section className="relative min-h-[90vh] flex items-center justify-center px-6 overflow-hidden">
-          {/* Dynamic Background */}
           <div className="absolute inset-0 bg-[#050A18]">
             <div className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-blue-600/20 blur-[150px] rounded-full animate-pulse" style={{animationDuration: '8s'}} />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-cyan-600/10 blur-[120px] rounded-full animate-pulse" style={{animationDuration: '10s'}} />
@@ -169,7 +76,7 @@ const App = () => {
             <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 leading-relaxed mb-12 font-light">
               M. Kabir is redefining academic excellence. 
               <span className="text-white font-medium"> 5x Consecutive Topper</span>. 
-              <span className="text-white font-medium"> AI Strategist</span>. 
+              <span className="text-white font-medium"> Tech Strategist</span>. 
               <span className="text-white font-medium"> Aspiring Surgeon</span>.
             </p>
 
@@ -206,7 +113,7 @@ const App = () => {
             <div onClick={() => navigate('expertise')} className="p-8 rounded-3xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-cyan-500/30 transition-all cursor-pointer group">
               <Cpu className="w-10 h-10 text-blue-400 mb-6" />
               <h3 className="text-2xl font-bold text-white mb-2">Tech & Biology</h3>
-              <p className="text-slate-400 text-sm">Merging robotic surgery aspirations with advanced AI prompt engineering.</p>
+              <p className="text-slate-400 text-sm">Merging robotic surgery aspirations with advanced systems engineering.</p>
               <div className="mt-6 flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-widest group-hover:gap-4 transition-all">
                 See Skills <ArrowRight className="w-4 h-4" />
               </div>
@@ -269,7 +176,7 @@ const App = () => {
       { year: "2023", title: "The Climb", desc: "Doubled win rate to 50%. Became a Math Olympiad Finalist (Top 12) and BTV Representative." },
       { year: "2024", title: "The Breakthrough", desc: "Maintained 50% academic lead while dominating extracurriculars. Current Affairs Champion." },
       { year: "2025", title: "The Summit", desc: "Achieved the perfect 100% win rate (5/5 Terms) in Class 10. Total academic dominance." },
-      { year: "2026", title: "The Horizon", desc: "Target: SSC National Distinction. Focus: Pre-Medical Sciences & Advanced AI." },
+      { year: "2026", title: "The Horizon", desc: "Target: SSC National Distinction. Focus: Pre-Medical Sciences & Robotics." },
     ];
 
     return (
@@ -278,12 +185,8 @@ const App = () => {
           <h2 className="text-sm font-bold text-cyan-500 uppercase tracking-widest mb-4">The Trajectory</h2>
           <div className="flex justify-between items-end mb-12">
             <h1 className="text-5xl md:text-7xl font-black text-white">Exponential <br/> Evolution.</h1>
-            <button onClick={() => handleAiAction('pitch')} className="hidden md:flex items-center gap-2 px-6 py-3 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-xs font-bold uppercase tracking-widest text-cyan-400 hover:bg-cyan-500/20 transition-all">
-              <Sparkles className="w-4 h-4" /> Analyze This Growth
-            </button>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
             {stats.map((stat, idx) => (
               <div key={idx} className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center group hover:bg-white/10 transition-all">
@@ -294,7 +197,6 @@ const App = () => {
             ))}
           </div>
 
-          {/* Timeline */}
           <div className="relative border-l-2 border-white/10 pl-8 md:pl-12 space-y-16">
             {timeline.map((item, idx) => (
               <div key={idx} className="relative group">
@@ -320,59 +222,52 @@ const App = () => {
         <h2 className="text-sm font-bold text-cyan-500 uppercase tracking-widest mb-4">Capabilities</h2>
         <h1 className="text-5xl md:text-7xl font-black text-white mb-16">The Dual Engine.</h1>
 
-        {/* AI Section */}
         <section className="mb-24">
           <div className="flex items-center gap-4 mb-8">
             <Cpu className="w-12 h-12 text-blue-400" />
-            <h2 className="text-4xl font-bold text-white">AI Utilization Expert</h2>
+            <h2 className="text-4xl font-bold text-white">Technology Integration</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="prose prose-invert prose-lg">
               <p className="text-slate-400 leading-relaxed">
-                I don't just use AI; I leverage it as a cognitive amplifier. My expertise lies in high-level 
-                <span className="text-white font-bold"> Prompt Engineering</span> and integrating LLMs into academic workflows.
+                I leverage high-level computational tools as cognitive amplifiers, integrating modern frameworks into complex academic workflows.
               </p>
               <ul className="space-y-4 mt-6">
                 <li className="flex items-start gap-3">
                   <CheckIcon />
-                  <span><strong>Prompt Architecture:</strong> Designing complex chain-of-thought prompts for research synthesis.</span>
+                  <span><strong>System Architecture:</strong> Designing efficient logic flows for data synthesis.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckIcon />
-                  <span><strong>Ed-Tech Integration:</strong> Creating personalized learning pathways using generative AI.</span>
+                  <span><strong>Ed-Tech Optimization:</strong> Creating personalized learning pathways via software tools.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckIcon />
-                  <span><strong>Neural Analysis:</strong> Utilizing AI for rapid data processing in biology and math.</span>
+                  <span><strong>Data Analysis:</strong> Utilizing rapid processing for biological and mathematical research.</span>
                 </li>
               </ul>
             </div>
-            {/* Improved Recent Application Card */}
             <div className="bg-blue-900/10 border border-blue-500/20 rounded-3xl p-8 flex flex-col justify-center relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Terminal className="w-32 h-32 text-blue-400" />
               </div>
               <h3 className="text-xl font-bold text-blue-300 mb-6 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-400"/> Case Study: Exam Prep
+                Case Study: Exam Efficiency
               </h3>
               <div className="space-y-4 relative z-10">
                  <div className="bg-[#050A18] p-4 rounded-xl border border-white/5">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 font-bold">The Challenge</p>
                     <p className="text-sm text-slate-300 leading-snug">Synthesize complex cellular respiration data into a readable format for exam revision.</p>
                  </div>
-                 <div className="flex justify-center -my-2">
-                    <ArrowRight className="w-5 h-5 text-blue-500 rotate-90 animate-bounce" />
-                 </div>
                  <div className="bg-[#050A18] p-4 rounded-xl border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-                    <p className="text-[10px] text-blue-400 uppercase tracking-wider mb-1 font-bold">AI Solution</p>
-                    <p className="text-sm text-white font-medium leading-snug">Generated optimized study models & ATP yield analysis using custom-tuned prompts.</p>
+                    <p className="text-[10px] text-blue-400 uppercase tracking-wider mb-1 font-bold">Solution</p>
+                    <p className="text-sm text-white font-medium leading-snug">Implemented optimized study models & ATP yield analysis using structured logic.</p>
                  </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Surgeon Section */}
         <section>
           <div className="flex items-center gap-4 mb-8">
             <Stethoscope className="w-12 h-12 text-cyan-400" />
@@ -384,15 +279,11 @@ const App = () => {
                 <Microscope className="w-20 h-20 text-cyan-500/50 mb-6" />
                 <h3 className="text-2xl font-bold text-white mb-2">Target Specialization</h3>
                 <p className="text-cyan-300 font-mono text-lg">Robotic & Neural Surgery</p>
-                <button onClick={() => handleAiAction('roadmap')} className="mt-8 px-6 py-3 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 rounded-full text-sm font-bold uppercase tracking-widest transition-all">
-                  View Strategic Roadmap
-                </button>
               </div>
             </div>
             <div className="prose prose-invert prose-lg order-1 md:order-2">
               <p className="text-slate-400 leading-relaxed">
-                The future of medicine isn't just biological; it's algorithmic. My goal is to master the human anatomy 
-                while pioneering the use of <span className="text-white font-bold">Robotic Assisted Systems</span>.
+                The future of medicine is precision-driven. My goal is to master human anatomy while pioneering the use of <span className="text-white font-bold">Robotic Assisted Systems</span>.
               </p>
               <div className="grid grid-cols-2 gap-4 mt-6">
                  <div className="p-4 bg-white/5 rounded-xl border border-white/10">
@@ -427,11 +318,11 @@ const App = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
           <div className="p-8 bg-white/5 rounded-3xl border border-white/10 hover:border-cyan-500/30 transition-all">
             <h3 className="text-xl font-bold text-white mb-2">Explore</h3>
-            <p className="text-slate-500 text-sm">To never set limits on learning, whether it is the depths of scripture or the edge of code.</p>
+            <p className="text-slate-500 text-sm">To never set limits on learning, whether it is the depths of scripture or the edge of technology.</p>
           </div>
           <div className="p-8 bg-white/5 rounded-3xl border border-white/10 hover:border-cyan-500/30 transition-all">
             <h3 className="text-xl font-bold text-white mb-2">Discover</h3>
-            <p className="text-slate-500 text-sm">To find the hidden connections between the organic world and artificial intelligence.</p>
+            <p className="text-slate-500 text-sm">To find the hidden connections between the organic world and the digital future.</p>
           </div>
           <div className="p-8 bg-white/5 rounded-3xl border border-white/10 hover:border-cyan-500/30 transition-all">
             <h3 className="text-xl font-bold text-white mb-2">Dive In</h3>
@@ -445,7 +336,6 @@ const App = () => {
   return (
     <div className="min-h-screen bg-[#050A18] text-slate-200 selection:bg-cyan-500/30 font-sans">
       
-      {/* Dynamic Nav */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#050A18]/80 backdrop-blur-xl border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="text-2xl font-bold tracking-tighter text-white flex items-center gap-2 cursor-pointer group" onClick={() => navigate('home')}>
@@ -475,7 +365,6 @@ const App = () => {
         </div>
       </nav>
 
-      {/* Main Content Area */}
       <main>
         {currentPage === 'home' && <HomeView />}
         {currentPage === 'journey' && <JourneyView />}
@@ -483,70 +372,17 @@ const App = () => {
         {currentPage === 'vision' && <VisionView />}
       </main>
 
-      {/* AI Modal Overlay */}
-      {activeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6 p-4 animate-in fade-in duration-300">
-          <div className="absolute inset-0 bg-[#050A18]/95 backdrop-blur-xl" onClick={() => setActiveModal(null)}></div>
-          <div className="relative w-full max-w-3xl bg-[#0A192F] border border-cyan-500/20 rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.15)]">
-            <div className="bg-white/5 px-6 py-4 border-b border-white/10 flex items-center justify-between">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500/50" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-                <div className="w-3 h-3 rounded-full bg-green-500/50" />
-              </div>
-              <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <Terminal className="w-3 h-3" /> system_output.log
-              </div>
-              <button onClick={() => setActiveModal(null)} className="text-slate-400 hover:text-white"><X className="w-5 h-5"/></button>
-            </div>
-
-            <div className="p-8 md:p-12 overflow-y-auto max-h-[70vh]">
-              {aiLoading ? (
-                <div className="py-20 flex flex-col items-center justify-center gap-6">
-                  <div className="relative">
-                    <div className="w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-                    <Sparkles className="absolute inset-0 m-auto w-6 h-6 text-cyan-400 animate-pulse" />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-mono text-cyan-500 mb-2">GENERATING INSIGHTS...</p>
-                    <p className="text-xs text-slate-500 animate-pulse">Running neural synthesis for M. Kabir</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-lg text-[10px] font-mono mb-6 border border-cyan-500/20">
-                    <Sparkles className="w-3 h-3" /> RESULT_SUCCESS
-                  </div>
-                  <div className="bg-[#050A18] rounded-2xl p-8 border border-white/5 shadow-inner">
-                    <p className="text-slate-300 leading-relaxed whitespace-pre-wrap font-mono text-sm sm:text-base">
-                      {aiResponse}
-                    </p>
-                  </div>
-                  <div className="mt-8 flex justify-end">
-                     <button onClick={() => setActiveModal(null)} className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-bold transition-all border border-white/10">
-                      Done
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Redesigned Contact Modal */}
       {showContactModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center px-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-[#030712]/95 backdrop-blur-xl" onClick={() => setShowContactModal(false)}></div>
           <div className="relative w-full max-w-lg bg-gradient-to-br from-[#0A192F] to-[#030712] border border-cyan-500/30 rounded-[2.5rem] p-10 shadow-[0_0_60px_rgba(6,182,212,0.15)] scale-100 animate-in zoom-in-95 duration-300 overflow-hidden">
-            {/* Background decoration */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[80px] rounded-full pointer-events-none -mt-20 -mr-20" />
             
             <button onClick={() => setShowContactModal(false)} className="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors bg-white/5 p-2 rounded-full"><X className="w-5 h-5"/></button>
             
             <div className="mb-10 relative z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-500/10 rounded-full border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-4">
-                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" /> Live Status: Online
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" /> Status: Available
               </div>
               <h3 className="text-4xl font-black text-white mb-2">Let's Connect.</h3>
               <p className="text-slate-400 text-lg">Collaborations, inquiries, or academic discussions.</p>
@@ -586,65 +422,6 @@ const App = () => {
           </div>
         </div>
       )}
-
-      {/* AI Chatbot FAB & Window */}
-      <div className="fixed bottom-6 right-6 z-[100]">
-        {!isChatOpen && (
-          <button 
-            onClick={() => setIsChatOpen(true)}
-            className="w-16 h-16 bg-cyan-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:scale-110 transition-all group"
-          >
-            <Bot className="w-8 h-8 text-black group-hover:rotate-12 transition-transform" />
-          </button>
-        )}
-
-        {isChatOpen && (
-          <div className="w-[350px] sm:w-[400px] h-[550px] bg-[#0A192F] border border-white/10 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-10">
-            <div className="bg-cyan-500 p-6 flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-black/20 rounded-full flex items-center justify-center">
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold leading-none">KabirBot</h4>
-                  <span className="text-cyan-100 text-[10px] font-bold uppercase tracking-widest">Always Active</span>
-                </div>
-              </div>
-              <button onClick={() => setIsChatOpen(false)} className="text-white/70 hover:text-white transition-colors">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
-              {chatMessages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] p-4 rounded-2xl text-sm ${
-                    msg.role === 'user' 
-                    ? 'bg-cyan-500 text-black font-medium rounded-tr-none shadow-lg' 
-                    : 'bg-white/5 text-slate-300 border border-white/10 rounded-tl-none'
-                  }`}>
-                    {msg.text}
-                  </div>
-                </div>
-              ))}
-              <div ref={chatEndRef} />
-            </div>
-
-            <form onSubmit={handleChatSubmit} className="p-4 bg-white/5 border-t border-white/10 flex gap-2">
-              <input 
-                type="text" 
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ask about Kabir..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all text-white"
-              />
-              <button type="submit" className="w-12 h-12 bg-cyan-500 rounded-xl flex items-center justify-center hover:bg-cyan-400 transition-colors shrink-0">
-                <Send className="w-5 h-5 text-black" />
-              </button>
-            </form>
-          </div>
-        )}
-      </div>
 
       <footer className="py-12 px-6 border-t border-white/5 bg-[#030712] text-center">
         <p className="text-slate-500 text-xs tracking-widest uppercase">&copy; 2024 M. Kabir • Precision & Vision</p>
